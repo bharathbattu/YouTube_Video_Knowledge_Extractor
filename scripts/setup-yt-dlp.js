@@ -46,8 +46,10 @@ function downloadFile(url, dest) {
       response.pipe(file);
 
       file.on('finish', () => {
-        file.close();
-        resolve();
+        file.close((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
       });
     });
 
@@ -68,7 +70,7 @@ async function main() {
     console.log('Download complete.');
 
     // Wait for file handle to be fully released to avoid "Text file busy" errors
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     if (PLATFORM !== 'win32') {
       console.log('Making binary executable...');
@@ -77,12 +79,22 @@ async function main() {
 
     console.log(`yt-dlp setup successful at ${BIN_PATH}`);
     
-    // Verify it works
-    try {
-      const version = execSync(`"${BIN_PATH}" --version`).toString().trim();
-      console.log(`yt-dlp version: ${version}`);
-    } catch (e) {
-      console.warn('Warning: Could not verify yt-dlp version (it might still work)');
+    // Verify it works with retry
+    let attempts = 0;
+    const maxAttempts = 3;
+    while (attempts < maxAttempts) {
+      try {
+        const version = execSync(`"${BIN_PATH}" --version`).toString().trim();
+        console.log(`yt-dlp version: ${version}`);
+        break;
+      } catch (e) {
+        attempts++;
+        if (attempts === maxAttempts) {
+          console.warn('Warning: Could not verify yt-dlp version (it might still work)');
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
     }
 
   } catch (error) {
