@@ -75,6 +75,8 @@ async function main() {
     if (PLATFORM !== 'win32') {
       console.log('Making binary executable...');
       fs.chmodSync(BIN_PATH, '755');
+      // Wait after chmod to ensure metadata update settles
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     console.log(`yt-dlp setup successful at ${BIN_PATH}`);
@@ -88,11 +90,12 @@ async function main() {
         console.log(`yt-dlp version: ${version}`);
         break;
       } catch (e) {
+        console.log(`Verification attempt ${attempts + 1} failed: ${e.message}`);
         attempts++;
         if (attempts === maxAttempts) {
           console.warn('Warning: Could not verify yt-dlp version (it might still work)');
         } else {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
     }
