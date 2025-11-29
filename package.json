@@ -17,7 +17,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/setup-yt-dlp.js"
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.12",

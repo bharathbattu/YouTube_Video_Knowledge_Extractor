@@ -6,6 +6,7 @@ import { YoutubeTranscript } from 'youtube-transcript';
 import ytdl from '@distube/ytdl-core';
 import { execFile } from 'child_process';
 import { promises as fs } from 'fs';
+import * as fsSync from 'fs';
 import path from 'path';
 import os from 'os';
 import { promisify } from 'util';
@@ -143,12 +144,16 @@ export async function fetchTranscript(videoId: string): Promise<string | null> {
  */
 function getYtDlpPath(): string {
   const binName = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp';
-  const localPath = path.join(process.cwd(), binName);
   const binDirPath = path.join(process.cwd(), 'bin', binName);
+  const localPath = path.join(process.cwd(), binName);
   
-  // Check local directory first, then bin directory
-  // In production, you might want to use a system-installed yt-dlp
-  return localPath; // Default to local for now
+  // Check bin directory first (preferred for Vercel/Production)
+  if (fsSync.existsSync(binDirPath)) {
+    return binDirPath;
+  }
+  
+  // Fallback to local directory
+  return localPath;
 }
 
 /**
