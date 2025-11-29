@@ -21,7 +21,8 @@ function getDownloadUrl() {
     case 'darwin':
       return `${baseUrl}/yt-dlp_macos`;
     default:
-      return `${baseUrl}/yt-dlp`;
+      // Use the standalone Linux binary which includes Python
+      return `${baseUrl}/yt-dlp_linux`;
   }
 }
 
