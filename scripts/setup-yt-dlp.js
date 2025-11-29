@@ -67,6 +67,9 @@ async function main() {
     await downloadFile(url, BIN_PATH);
     console.log('Download complete.');
 
+    // Wait for file handle to be fully released to avoid "Text file busy" errors
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     if (PLATFORM !== 'win32') {
       console.log('Making binary executable...');
       fs.chmodSync(BIN_PATH, '755');
