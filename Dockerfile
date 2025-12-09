@@ -1,5 +1,5 @@
-# Use Node.js 18 on Alpine Linux for a small, secure image
-FROM node:18-alpine
+# Use Node.js 20 on Alpine Linux (required by dependencies)
+FROM node:20-alpine
 
 # Install system dependencies
 # python3: Required for some yt-dlp operations
@@ -9,8 +9,9 @@ RUN apk add --no-cache python3 ffmpeg
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files and scripts first
 COPY package*.json ./
+COPY scripts/ ./scripts/
 
 # Install dependencies
 # This will also trigger the 'postinstall' script to download yt-dlp
